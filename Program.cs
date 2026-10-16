@@ -4,9 +4,9 @@ using System.Runtime.CompilerServices;
 
 class Program
 {
-    static Dictionary<string, string> clientes = new Dictionary<string, string>();
-    static Dictionary<string, decimal> produtos = new Dictionary<string, decimal>();
-    static Dictionary<string, List<string>> produtosDoCarrinho = new Dictionary<string, List<string>>();
+    static Dictionary<string, Cliente> clientes = new Dictionary<string, Cliente>();
+    static Dictionary<string, Produto> produtos = new Dictionary<string, Produto>();
+    static Dictionary<string, List<Produto>> produtosDoCarrinho = new Dictionary<string, List<Produto>>();
 
     static void Main()
     {
@@ -34,9 +34,10 @@ class Program
         Console.WriteLine("1 - Cadastrar Cliente");
         Console.WriteLine("2 - Listar Clientes");
         Console.WriteLine("3 - Cadastrar Produto");
-        Console.WriteLine("4 - Ajustar Preço do Produto");
-        Console.WriteLine("5 - Adicionar Produto no Carrinho");
-        Console.WriteLine("6 - Fechar Compra");
+        Console.WriteLine("4 - Listar Produtos");
+        Console.WriteLine("5 - Ajustar Preço do Produto");
+        Console.WriteLine("6 - Adicionar Produto no Carrinho");
+        Console.WriteLine("7 - Fechar Compra");
         Console.WriteLine("-1 - Sair");
         Console.Write("> ");
 
@@ -55,12 +56,15 @@ class Program
                 CadastrarProduto();
                 break;
             case "4":
-                AjustarPrecoProduto();
+                ListarProdutos();
                 break;
             case "5":
-                AdicionarProdutoNoCarrinho();
+                AjustarPrecoProduto();
                 break;
             case "6":
+                AdicionarProdutoNoCarrinho();
+                break;
+            case "7":
                 FecharCompra();
                 break;
             case "-1":
@@ -79,25 +83,39 @@ class Program
         string? nome = Console.ReadLine();
         Console.Write("Digite o CPF do cliente: ");
         string? cpf = Console.ReadLine();
+        Console.Write("Digite o e-mail do cliente: ");
+        string? email = Console.ReadLine();
+        Console.Write("Digite a profissão do cliente: ");
+        string? profissao = Console.ReadLine();
+        Console.Write("Digite o telefone do cliente: ");
+        string? telefone = Console.ReadLine();
 
-        if (!string.IsNullOrEmpty(nome) && !string.IsNullOrEmpty(cpf))
-        {
-            clientes[cpf] = nome;
-            produtosDoCarrinho[cpf] = new List<string>();
-            Console.WriteLine($"Usuário {nome} ({cpf}) cadastrado com sucesso.");
-        }
-        else
-        {
-            Console.WriteLine("Nome e CPF não podem estar vazios!");
-        }
+        Console.Write("Digite o estado: ");
+        string? estado = Console.ReadLine();
+        Console.Write("Digite a cidade: ");
+        string? cidade = Console.ReadLine();
+        Console.Write("Digite o bairro: ");
+        string? bairro = Console.ReadLine();
+        Console.Write("Digite a rua: ");
+        string? rua = Console.ReadLine();
+        Console.Write("Digite o número: ");
+        string? numero = Console.ReadLine();
+        Console.Write("Digite o complemento (opcional): ");
+        string? complemento = Console.ReadLine();
+
+        var endereco = new Endereco(estado, cidade, bairro, rua, numero, complemento ?? "");
+
+        clientes[cpf] = new Cliente(nome, cpf, email, profissao, telefone, endereco);
+        produtosDoCarrinho[cpf] = new List<Produto>();
+        Console.WriteLine($"Usuário {nome} ({cpf}) cadastrado com sucesso.");
     }
 
     static void ListarClientes()
     {
         Console.WriteLine("\nLista de clientes cadastrados:\n");
-        foreach (var cliente in clientes)
+        foreach (var cliente in clientes.Values)
         {
-            Console.WriteLine($"Nome: {cliente.Value}, CPF: {cliente.Key}");
+            cliente.ExibirDescricao();
         }
     }
 
@@ -105,132 +123,125 @@ class Program
     {
         Console.Write("\nDigite o nome do produto: ");
         string nome = Console.ReadLine();
+        Console.Write("Digite a descrição do produto: ");
+        string descricao = Console.ReadLine();
         Console.Write("Digite o preço do produto: ");
-        if (!decimal.TryParse(Console.ReadLine(), out decimal preco))
-        {
-            Console.WriteLine("Preço inválido.");
-            return;
-        }
+        decimal preco = decimal.Parse(Console.ReadLine());
+        Console.Write("Digite a quantidade do produto: ");
+        int quantidade = int.Parse(Console.ReadLine());
 
-        produtos[nome] = preco;
-
+        produtos[nome] = new Produto(nome, descricao, preco, quantidade);
         Console.WriteLine($"Produto {nome} cadastrado com sucesso.");
+    }
+
+    static void ListarProdutos()
+    {
+        Console.WriteLine("\nLista de produtos cadastrados:\n");
+        foreach (var produto in produtos.Values)
+        {
+            produto.ExibirDescricao();
+        }
     }
 
     static void AjustarPrecoProduto()
     {
-        Console.WriteLine("Produtos disponíveis:");
-        foreach (var produto in produtos)
-        {
-            Console.WriteLine($"- {produto.Key}: R$ {produto.Value}");
-        }
         Console.Write("\nQual produto você deseja ajustar o preço?");
         string nome = Console.ReadLine();
-        if (produtos.ContainsKey(nome))
-        {
-            Console.Write("Digite o novo preço do produto: ");
-            if (!decimal.TryParse(Console.ReadLine(), out decimal novoPreco))
-            {
-                Console.WriteLine("Preço inválido.");
-                return;
-            }
-            produtos[nome] = novoPreco;
-            Console.WriteLine($"Preço do produto {nome} ajustado para {novoPreco} com sucesso.");
-        }
-        else
+        if (!produtos.TryGetValue(nome, out Produto produto))
         {
             Console.WriteLine($"Produto {nome} não cadastrado no sistema.");
+            return;
         }
+
+        Console.Write("Digite o novo preço do produto: ");
+        decimal novoPreco = decimal.Parse(Console.ReadLine());
+
+        produto.AjustarPreco(novoPreco);
+        Console.WriteLine($"Preço do produto {produto.Nome} ajustado para {novoPreco} com sucesso.");
     }
 
     static void AdicionarProdutoNoCarrinho()
     {
-        Console.Write("\nDigite o nome do usuário que está comprando: ");
-        string nomeUsuario = Console.ReadLine();
-        if (clientes.ContainsValue(nomeUsuario))
+        Console.Write("\nDigite o cpf do usuário que está comprando: ");
+        string cpfUsuario = Console.ReadLine();
+
+        if (!clientes.TryGetValue(cpfUsuario, out Cliente cliente))
         {
-            Console.WriteLine("Produtos disponíveis:");
-            foreach (var produto in produtos)
-            {
-                Console.WriteLine($"- {produto.Key}: R$ {produto.Value}");
-            }
-            Console.Write("Digite o nome do produto que deseja adicionar ao carrinho: ");
-            string nomeProduto = Console.ReadLine();
-            if (produtos.ContainsKey(nomeProduto))
-            {
-                if (!produtosDoCarrinho.ContainsKey(nomeUsuario))
-                {
-                    produtosDoCarrinho[nomeUsuario] = new List<string>();
-                }
-                produtosDoCarrinho[nomeUsuario].Add(nomeProduto);
-                Console.WriteLine($"Produto {nomeProduto} adicionado ao carrinho do usuário {nomeUsuario} com sucesso.");
-            }
-            else
-            {
-                Console.WriteLine($"Produto {nomeProduto} não cadastrado no sistema.");
-            }
-        }
-        else
-        {
-            Console.WriteLine($"Usuário {nomeUsuario} não cadastrado no sistema.");
+            Console.WriteLine($"Usuário {cpfUsuario} não cadastrado no sistema.");
+            return;
         }
 
+        Console.WriteLine("Produtos disponíveis:");
+        foreach (var produto in produtos.Values)
+        {
+            produto.ExibirDescricao();
+        }
 
+        Console.Write("Digite o nome do produto que deseja adicionar ao carrinho: ");
+        string nomeProduto = Console.ReadLine();
+
+        if (!produtos.TryGetValue(nomeProduto, out Produto produtoEscolhido))
+        {
+            Console.WriteLine($"Produto {nomeProduto} não cadastrado no sistema.");
+            return;
+        }
+
+        if (!produtosDoCarrinho.ContainsKey(cpfUsuario))
+        {
+            produtosDoCarrinho[cpfUsuario] = new List<Produto>();
+        }
+
+        produtosDoCarrinho[cpfUsuario].Add(produtoEscolhido);
+        Console.WriteLine($"Produto {produtoEscolhido.Nome} adicionado ao carrinho de {cliente.Nome} com sucesso.");
     }
 
-    private static void ExibirProdutosNoCarrinho(string nomeUsuario)
+    private static void ExibirProdutosNoCarrinho(string cpfUsuario)
     {
-        Console.WriteLine($"Produtos no carrinho do usuário {nomeUsuario}:");
-        foreach (var item in produtosDoCarrinho)
+        Console.WriteLine($"Produtos no carrinho do usuário {cpfUsuario}:");
+        if (!produtosDoCarrinho.TryGetValue(cpfUsuario, out List<Produto> carrinho) || carrinho.Count == 0)
         {
-            if (item.Key == nomeUsuario)
-            {
-                foreach (var produto in item.Value)
-                {
-                    Console.WriteLine($"\n{produto}");
-                }
-            }
+            Console.WriteLine("Carrinho vazio.");
+            return;
+        }
+
+        foreach (var produto in carrinho)
+        {
+            produto.ExibirDescricao();
         }
     }
 
-    private static decimal CalcularValorFinalDaCompra(string nomeUsuario)
+    private static decimal CalcularValorFinalDaCompra(string cpfUsuario)
     {
         decimal valorTotal = 0;
-        foreach (var produto in produtosDoCarrinho)
+        if (produtosDoCarrinho.TryGetValue(cpfUsuario, out List<Produto> carrinho))
         {
-            if (produto.Key == nomeUsuario)
+            foreach (var produto in carrinho)
             {
-                foreach (string nomeProduto in produto.Value)
-                {
-                    if (produtos.ContainsKey(nomeProduto))
-                    {
-                        decimal precoProduto = produtos[nomeProduto];
-                        valorTotal += precoProduto;
-                    }
-                }
+                valorTotal += produto.PrecoUnitario;
             }
         }
-        Console.WriteLine($"Valor total da compra do usuário {nomeUsuario}: R$ {valorTotal}");
+
+        Console.WriteLine($"Valor total da compra do usuário {cpfUsuario}: R$ {valorTotal}");
         return valorTotal;
     }
 
     static void FecharCompra()
     {
-        Console.WriteLine("\nDigite o nome do usuário que deseja finalizar a compra: ");
-        string nomeUsuario = Console.ReadLine();
-            if (clientes.ContainsValue(nomeUsuario))
-            {
-            ExibirProdutosNoCarrinho(nomeUsuario);
-            decimal valorTotal = CalcularValorFinalDaCompra(nomeUsuario);
+        Console.WriteLine("\nDigite o cpf do usuário que deseja finalizar a compra: ");
+        string cpfUsuario = Console.ReadLine();
 
-            Console.WriteLine("Digite o número do cartão:");
-            string numeroCartao = Console.ReadLine();
-            Console.WriteLine($"Realizando pagamento de R$ {valorTotal} no cartão {numeroCartao}.");
-            }
-            else
-            {
-                Console.WriteLine($"Usuário {nomeUsuario} não cadastrado no sistema.");
-            }
+        if (!clientes.TryGetValue(cpfUsuario, out Cliente cliente))
+        {
+            Console.WriteLine($"Usuário {cpfUsuario} não cadastrado no sistema.");
+            return;
+        }
+
+        ExibirProdutosNoCarrinho(cpfUsuario);
+        decimal valorTotal = CalcularValorFinalDaCompra(cpfUsuario);
+
+        Console.WriteLine("Digite o número do cartão:");
+        string numeroCartao = Console.ReadLine();
+        Console.WriteLine($"Realizando pagamento de R$ {valorTotal} no cartão {numeroCartao} para {cliente.Nome}.");
     }
 
 
