@@ -1,9 +1,10 @@
-﻿using System;
+﻿namespace Models;
+using System;
 
-public class Produto
+public class Produto : IDescritivel
 {
-	public string Nome { get; set; }
-	public string Descricao { get; set; }
+	public string Nome { get; private set; }
+	public string Descricao { get; private set; }
 	public decimal PrecoUnitario { get; private set; }
 	public int Quantidade { get; private set; }
 
@@ -24,10 +25,10 @@ public class Produto
 		Quantidade = quantidade;
 	}
 
-	public void ExibirDescricao()
-    {
-        Console.WriteLine($"Nome: {Nome}, Descrição: {Descricao}, Preço Unitário: R$ {PrecoUnitario}, Quantidade: {Quantidade}");
-    }
+	public virtual void ExibirDescricao()
+	{
+		Console.WriteLine($"Nome: {Nome}, Descrição: {Descricao}, Preço Unitário: {PrecoUnitario:C}, Quantidade: {Quantidade}");
+	}
 
     public void AjustarPreco(decimal novoPreco)
 	{
@@ -43,5 +44,10 @@ public class Produto
 			throw new ArgumentException("A quantidade não pode ser negativa.", nameof(novaQuantidade));
 
 		Quantidade = novaQuantidade;
+	}
+
+	public override string ToString()
+	{
+		return $"Nome: {Nome}, Descrição: {Descricao}, Preço Unitário: {PrecoUnitario:C}, Quantidade: {Quantidade}";
 	}
 }
