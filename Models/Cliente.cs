@@ -1,6 +1,9 @@
-﻿using System;
+﻿namespace Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-public class Cliente
+public class Cliente : IDescritivel
 {
 	public string Nome { get; private set; }
 	public string CPF { get; }
@@ -8,6 +11,9 @@ public class Cliente
 	public string Profissao { get; private set; }
 	public string Telefone { get; private set; }
 	public Endereco Endereco { get; private set; }
+
+	private readonly List<ItemCarrinho> carrinho = new List<ItemCarrinho>();
+	public IReadOnlyList<ItemCarrinho> Carrinho => carrinho;
 
 	public Cliente(string nome, string cpf, string email, string profissao, string telefone, Endereco endereco)
 	{
@@ -32,7 +38,24 @@ public class Cliente
     }
 
 	public void ExibirDescricao()
-    {
-        Console.WriteLine($"Nome: {Nome}, CPF: {CPF}, E-mail: {Email}, Profissão: {Profissao}, Telefone: {Telefone}, Endereço: {Endereco}");
-    }
+	{
+		Console.WriteLine($"Nome: {Nome}, CPF: {CPF}, E-mail: {Email}, Profissão: {Profissao}, Telefone: {Telefone}, Endereço: {Endereco}");
+	}
+
+	public void AdicionarAoCarrinho(Produto produto)
+	{
+		if (produto is null)
+			throw new ArgumentNullException(nameof(produto));
+
+		var itemExistente = carrinho.FirstOrDefault(item => item.Produto == produto);
+		if (itemExistente is null)
+			carrinho.Add(new ItemCarrinho(produto));
+		else
+			itemExistente.IncrementarQuantidade();
+	}
+
+	public void LimparCarrinho()
+	{
+		carrinho.Clear();
+	}
 }

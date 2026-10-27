@@ -1,4 +1,5 @@
-﻿using System;
+﻿namespace Models;
+using System;
 
 public class Endereco
 {
