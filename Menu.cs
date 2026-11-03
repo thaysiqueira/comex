@@ -5,6 +5,7 @@ public class Menu
 {
     private readonly ClienteService clienteService = new ClienteService();
     private readonly ProdutoService produtoService = new ProdutoService();
+    private readonly ApiExternaService apiExternaService = new ApiExternaService();
 
     public void Executar()
     {
@@ -36,6 +37,9 @@ public class Menu
         Console.WriteLine("5 - Ajustar Preço do Produto");
         Console.WriteLine("6 - Adicionar Produto no Carrinho");
         Console.WriteLine("7 - Fechar Compra");
+        Console.WriteLine("8 - Buscar Produtos em API Externa");
+        Console.WriteLine("9 - Ordenar Produtos Externos por Nome");
+        Console.WriteLine("10 - Ordenar Produtos Externos por Preço");
         Console.WriteLine("-1 - Sair");
         Console.Write("> ");
 
@@ -64,6 +68,15 @@ public class Menu
                 break;
             case "7":
                 clienteService.FecharCompra();
+                break;
+            case "8":
+                apiExternaService.BuscarProdutosExternosAsync().GetAwaiter().GetResult();
+                break;
+            case "9":
+                apiExternaService.OrdenarProdutosPorNome();
+                break;
+            case "10":
+                apiExternaService.OrdenarProdutosPorPreco();
                 break;
             case "-1":
                 Console.WriteLine("COMEX FINALIZADO!");
