@@ -1,90 +1,23 @@
 using System;
-using Services;
 
-public class Menu
+/// <summary>
+/// Classe base abstrata para todas as opções de menu do Comex.
+/// Cada opção concreta herda desta classe e implementa <see cref="Executar"/>.
+/// </summary>
+public abstract class Menu
 {
-    private readonly ClienteService clienteService = new ClienteService();
-    private readonly ProdutoService produtoService = new ProdutoService();
-    private readonly ApiExternaService apiExternaService = new ApiExternaService();
+    /// <summary>
+    /// Texto exibido para o usuário identificando a opção de menu.
+    /// </summary>
+    public string Titulo { get; }
 
-    public void Executar()
+    protected Menu(string titulo)
     {
-        string opcao = "";
-
-        while (opcao != "-1")
-        {
-            try
-            {
-                ExibirMenuDeOpcoes();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ocorreu um erro inesperado: {ex.Message}");
-            }
-        }
-
-        Console.WriteLine("COMEX FINALIZADO!");
+        Titulo = titulo;
     }
 
-    private void ExibirMenuDeOpcoes()
-    {
-        Console.WriteLine("============= PROJETO COMEX =============");
-        Console.WriteLine("\nEscolha uma opção:");
-        Console.WriteLine("1 - Cadastrar Cliente");
-        Console.WriteLine("2 - Listar Clientes");
-        Console.WriteLine("3 - Cadastrar Produto");
-        Console.WriteLine("4 - Listar Produtos");
-        Console.WriteLine("5 - Ajustar Preço do Produto");
-        Console.WriteLine("6 - Adicionar Produto no Carrinho");
-        Console.WriteLine("7 - Fechar Compra");
-        Console.WriteLine("8 - Buscar Produtos em API Externa");
-        Console.WriteLine("9 - Ordenar Produtos Externos por Nome");
-        Console.WriteLine("10 - Ordenar Produtos Externos por Preço");
-        Console.WriteLine("-1 - Sair");
-        Console.Write("> ");
-
-        string? opcao = Console.ReadLine();
-        Console.WriteLine($"Opção escolhida: {opcao}");
-
-        switch (opcao)
-        {
-            case "1":
-                clienteService.CadastrarCliente();
-                break;
-            case "2":
-                clienteService.ListarClientes();
-                break;
-            case "3":
-                produtoService.CadastrarProduto();
-                break;
-            case "4":
-                produtoService.ListarProdutos();
-                break;
-            case "5":
-                produtoService.AjustarPrecoProduto();
-                break;
-            case "6":
-                clienteService.AdicionarProdutoNoCarrinho(produtoService);
-                break;
-            case "7":
-                clienteService.FecharCompra();
-                break;
-            case "8":
-                apiExternaService.BuscarProdutosExternosAsync().GetAwaiter().GetResult();
-                break;
-            case "9":
-                apiExternaService.OrdenarProdutosPorNome();
-                break;
-            case "10":
-                apiExternaService.OrdenarProdutosPorPreco();
-                break;
-            case "-1":
-                Console.WriteLine("COMEX FINALIZADO!");
-                Environment.Exit(0);
-                break;
-            default:
-                Console.WriteLine("Opção inválida.");
-                break;
-        }
-    }
+    /// <summary>
+    /// Executa a ação associada a esta opção de menu.
+    /// </summary>
+    public abstract void Executar();
 }

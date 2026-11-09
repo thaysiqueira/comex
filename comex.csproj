@@ -7,4 +7,17 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Comex.GeneradorRelatorio" Version="1.0.0" />
+  </ItemGroup>
+
+  <!-- A biblioteca Comex.GeneradorRelatorio é um projeto próprio e não deve ser
+       compilada como parte do executável raiz. -->
+  <ItemGroup>
+    <Compile Remove="Comex.GeneradorRelatorio\**\*.cs" />
+    <None Remove="Comex.GeneradorRelatorio\**\*" />
+    <Content Remove="Comex.GeneradorRelatorio\**\*" />
+    <EmbeddedResource Remove="Comex.GeneradorRelatorio\**\*" />
+  </ItemGroup>
+
 </Project>

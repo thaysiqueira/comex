@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFramework>net10.0</TargetFramework>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
+
+	<!-- Geração automática do arquivo de documentação XML -->
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+	<!-- Gera o pacote .nupkg automaticamente a cada build -->
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+	<!-- Pasta local usada como Feed NuGet Local para armazenar o .nupkg gerado -->
+	<PackageOutputPath>$(MSBuildThisFileDirectory)..\local-nuget-feed</PackageOutputPath>
+
+	<!-- Metadados do pacote NuGet -->
+	<PackageId>Comex.GeneradorRelatorio</PackageId>
+	<Title>Comex Gerador de Relatório</Title>
+	<Version>1.0.0</Version>
+	<Description>Biblioteca reutilizável para geração de relatórios de produtos do sistema Comex. Expõe o contrato IGeradorRelatorio e uma implementação concreta para exportação em CSV.</Description>
+	<Authors>Thays Siqueira</Authors>
+	<Company>Comex</Company>
+	<PackageTags>comex;relatorio;csv;exportacao</PackageTags>
+  </PropertyGroup>
+
+</Project>

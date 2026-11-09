@@ -26,7 +26,12 @@ public class ApiExternaService
             HttpResponseMessage resposta = await httpClient.GetAsync(UrlProdutos);
             resposta.EnsureSuccessStatusCode();
 
-            var produtosExternos = await resposta.Content.ReadFromJsonAsync<List<ProdutoExterno>>();
+            string jsonBruto = await resposta.Content.ReadAsStringAsync();
+
+            File.WriteAllText("produtos.json", jsonBruto);
+            Console.WriteLine("Conteúdo bruto da API salvo em 'produtos.json'.\n");
+
+            var produtosExternos = JsonSerializer.Deserialize<List<ProdutoExterno>>(jsonBruto);
 
             if (produtosExternos is null || produtosExternos.Count == 0)
             {
